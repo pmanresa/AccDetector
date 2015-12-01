@@ -7,9 +7,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.widget.Toast;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import weka.core.Attribute;
@@ -36,7 +39,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         // Initializing sensorManager and accelerometer
         senSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+        senAccelerometer = senSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
         //Initializing arff variables
@@ -111,10 +114,22 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         try {
 
-            ArffSaver saver = new ArffSaver();
+            File root = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "MotionDetector");
+            if(!root.exists()) {
+                root.mkdirs();
+            }
+
+            File nFile = new File(root,"motion.arff");
+            FileWriter fW = new FileWriter(nFile,true);
+            BufferedWriter writer = new BufferedWriter(fW);
+            writer.write(data.toString());
+            writer.flush();
+            writer.close();
+
+            /*ArffSaver saver = new ArffSaver();
             saver.setInstances(data);
-            saver.setFile(new File("./data/test.arff")); // Modify arff file saved destination to execute program
-            saver.writeBatch();
+            saver.setFile(new File("")); // Modify arff file saved destination to execute program
+            saver.writeBatch();*/
 
         }catch (IOException e){
             Context context = getApplicationContext();
